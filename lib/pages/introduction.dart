@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:gym_crowd/pages/login.dart';
+import 'package:gym_crowd/pages/register.dart';
 
 class IntroductionPage extends StatelessWidget {
   @override
@@ -8,7 +10,7 @@ class IntroductionPage extends StatelessWidget {
         children: [
           // Imagem de fundo
           Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               image: DecorationImage(
                 image: AssetImage('assets/GymCrowdLogo.png'),
                 fit: BoxFit.cover,
@@ -24,33 +26,39 @@ class IntroductionPage extends StatelessWidget {
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    _showRegisterDialog(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const Register()),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFFFF6000),
-                    minimumSize: Size(300, 50),
+                    backgroundColor: const Color(0xFFFF6000),
+                    minimumSize: const Size(300, 50),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  child: Text(
+                  child: const Text(
                     'Criar Conta',
                     style: TextStyle(color: Color(0xFFFFFFFF)),
                   ),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
-                    _showLoginDialog(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const Login()),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFFFFFFFF),
-                    minimumSize: Size(300, 50),
+                    backgroundColor: const Color(0xFFFFFFFF),
+                    minimumSize: const Size(300, 50),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  child: Text(
+                  child: const Text(
                     'Login',
                     style: TextStyle(color: Color(0xFFFF6000)),
                   ),
@@ -60,147 +68,6 @@ class IntroductionPage extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-
-  // Função para mostrar o diálogo de login
-  void _showLoginDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: Colors.white,
-          title: Text(
-            'Login',
-            style: TextStyle(color: Color(0xFFFF6000)),
-          ),
-          content: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  decoration: InputDecoration(
-                    labelText: 'Email',
-                    labelStyle: TextStyle(color: Color(0xFFFF6000)),
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                SizedBox(height: 16),
-                TextField(
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    labelText: 'Senha',
-                    labelStyle: TextStyle(color: Color(0xFFFF6000)),
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              child: Text('Cancelar',style: TextStyle(color: Colors.orange)),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            ElevatedButton(
-              child: Text('Entrar',style: TextStyle(color: Colors.white)),
-              style: ElevatedButton.styleFrom(
-                primary: Color(0xFFFF6000), // Cor laranja
-              ),
-              onPressed: () {
-                // Adicione a lógica de login aqui
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _showRegisterDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: Colors.white,
-          title: Text(
-            'Registrar',
-            style: TextStyle(color: Color(0xFFFF6000)),
-          ),
-          content: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16.0),
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    decoration: InputDecoration(
-                      labelText: 'Nome de Usuário',
-                      labelStyle: TextStyle(color: Color(0xFFFF6000)),
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  TextField(
-                    decoration: InputDecoration(
-                      labelText: 'Email',
-                      labelStyle: TextStyle(color: Color(0xFFFF6000)),
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  TextField(
-                    decoration: InputDecoration(
-                      labelText: 'CPF',
-                      labelStyle: TextStyle(color: Color(0xFFFF6000)),
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  TextField(
-                    obscureText: true,
-                    decoration: InputDecoration(
-                      labelText: 'Senha',
-                      labelStyle: TextStyle(color: Color(0xFFFF6000)),
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  TextField(
-                    obscureText: true,
-                    decoration: InputDecoration(
-                      labelText: 'Confirmar Senha',
-                      labelStyle: TextStyle(color: Color(0xFFFF6000)),
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                ],
-              ),
-            ),
-          ),
-          actions: [
-            TextButton(
-              child: Text('Cancelar' ,style: TextStyle(color: Colors.orange)),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            ElevatedButton(
-              child: Text('Registrar',style: TextStyle(color: Colors.white)),
-              style: ElevatedButton.styleFrom(
-                primary: Color(0xFFFF6000), // Cor laranja
-              ),
-              onPressed: () {
-                // Adicione a lógica de registro aqui
-              },
-            ),
-          ],
-        );
-      },
     );
   }
 }
