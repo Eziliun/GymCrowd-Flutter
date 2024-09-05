@@ -5,8 +5,6 @@ class LoginModelo {
   String cpf;
   String senha;
 
-  String? urlImagem;
-
   LoginModelo(
       {required this.id,
       required this.nome,

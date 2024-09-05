@@ -7,7 +7,14 @@ class Register extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Registrar'),
+        title: const Text(
+          'Cadastro',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 24,
+          ),
+        ),
+        centerTitle: true,
         backgroundColor: const Color(0xFFFF6000),
       ),
       body: Padding(
@@ -17,9 +24,9 @@ class Register extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Image.asset(
-              'assets/GymCrowdLogo2.png', // Caminho para a imagem no diretório assets
-              height: 300, // Altura da imagem
-            ),
+                'assets/GymCrowdLogo2.png', // Caminho para a imagem no diretório assets
+                height: 300, // Altura da imagem
+              ),
               const TextField(
                 decoration: InputDecoration(
                   labelText: 'Nome de Usuário',
@@ -63,22 +70,21 @@ class Register extends StatelessWidget {
               ),
               const SizedBox(height: 24),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  TextButton(
-                    child: const Text('Cancelar', style: TextStyle(color: Colors.orange)),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  ),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFFF6000), // Cor laranja
+                      backgroundColor: const Color(0xFFFF6000),
+                      minimumSize: const Size(300, 50),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
                     onPressed: () {
                       // Adicione a lógica de registro aqui
                     },
-                    child: const Text('Registrar', style: TextStyle(color: Colors.white)),
+                    child: const Text('Enviar',
+                        style: TextStyle(color: Colors.white)),
                   ),
                 ],
               ),
@@ -88,4 +94,4 @@ class Register extends StatelessWidget {
       ),
     );
   }
-  }
+}

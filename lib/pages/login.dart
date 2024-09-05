@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gym_crowd/pages/principal.dart';
 
 class Login extends StatelessWidget {
   const Login({super.key});
@@ -7,10 +8,18 @@ class Login extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Login'),
+        title: const Text(
+          'Login',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 24,
+          ),
+        ),
+        centerTitle: true,
         backgroundColor: const Color(0xFFFF6000),
       ),
-      body: SingleChildScrollView( // Adicionado para permitir a rolagem
+      body: SingleChildScrollView(
+        // Adicionado para permitir a rolagem
         padding: const EdgeInsets.all(16.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -19,7 +28,8 @@ class Login extends StatelessWidget {
               'assets/GymCrowdLogo2.png', // Caminho para a imagem no diretório assets
               height: 300, // Altura da imagem
             ),
-            const SizedBox(height: 32), // Espaçamento entre a imagem e os campos
+            const SizedBox(
+                height: 32), // Espaçamento entre a imagem e os campos
             const TextField(
               decoration: InputDecoration(
                 labelText: 'Email',
@@ -40,21 +50,19 @@ class Login extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                TextButton(
-                  child: const Text(
-                    'Cancelar',
-                    style: TextStyle(color: Colors.orange),
-                  ),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFFF6000), // Cor laranja
+                    backgroundColor: const Color(0xFFFF6000),
+                    minimumSize: const Size(300, 50),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ), // Cor laranja
                   ),
                   onPressed: () {
-                    // Lógica de login
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => Principal()),
+                    );
                   },
                   child: const Text(
                     'Entrar',
