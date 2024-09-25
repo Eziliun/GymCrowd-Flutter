@@ -12,20 +12,23 @@ class LoginModelo {
       required this.cpf,
       required this.senha});
 
-  LoginModelo.fromMap(Map<String, dynamic> map)
-      : id = map['id'],
-        nome = map['nome'],
-        email = map['email'],
-        cpf = map['cpf'],
-        senha = map['senha'];
+  factory LoginModelo.fromJson(Map<String, dynamic> json) {
+    return LoginModelo(
+      id: json['id'], 
+      nome: json['nome'], 
+      email: json['email'], 
+      cpf: json['cpf'], 
+      senha: json['senha'], 
+    );
+  }
 
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toJson() {
     return {
-      'id': id,
-      'nome': nome,
-      'email': email,
-      'cpf': cpf,
-      'senha': senha
+      'id': id, 
+      'nome': nome, 
+      'email': email, 
+      'cpf': cpf, 
+      'senha': senha 
     };
   }
 }

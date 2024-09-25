@@ -86,33 +86,31 @@ class Principal extends StatelessWidget {
         ),
       ),
       body: FlutterMap(
-          options:MapOptions(
-            initialCenter: LatLng(-3.737454, -38.5393108), 
-            initialZoom: 13.0, // Mudança: 'initialZoom' em vez de 'zoom'
-          ),
-          children: [
-            TileLayer(
-              urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-              subdomains: ['a', 'b', 'c'], // Usando tiles do OpenStreetMap
-            ),
-          /*MarkerLayer(
-              markers: [
-                Marker(
-                  point: LatLng(51.505, -0.09),
-                  width: 80.0,
-                  height: 80.0,
-                  builder: (ctx) => Container(
-                    child: const Icon(
-                      Icons.location_on,
-                      color: Colors.red,
-                      size: 40.0,
-                    ),
-                  ),
-                ),
-              ],
-            ),*/
-          ],
+        options: const MapOptions(
+          initialCenter: LatLng(-3.801716, -38.497009),
+          initialZoom: 13.0, // Mudança: 'initialZoom' em vez de 'zoom'
         ),
-      );
+        children: [
+          TileLayer(
+            urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+            subdomains: ['a', 'b', 'c'], // Usando tiles do OpenStreetMap
+          ),
+          const MarkerLayer(
+            markers: [
+              Marker(
+                point: LatLng(-3.801716, -38.497009),
+                width: 40,
+                height: 40,
+                child: Icon(
+                    Icons.location_on,  // Ícone de localização
+                    color: Colors.red,
+                    size: 40.0,        // Tamanho do ícone
+                  ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 }
