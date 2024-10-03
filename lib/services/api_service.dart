@@ -1,10 +1,23 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:gym_crowd/models/login_modelo.dart'; // Importe o model que você criou
+import 'package:gym_crowd/models/login_modelo.dart';
+import 'package:shared_preferences/shared_preferences.dart'; // Importe o model que você criou
 
 class ApiService {
   // Base URL da API
   final String baseUrl = 'http://192.168.0.13:5000';
+
+  // Método para salvar o token no armazenamento local
+  Future<void> _saveToken(String token) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('auth_token', token);
+  }
+
+  // Método para buscar o token salvo
+  Future<String?> _getToken() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString('auth_token');
+  }
 
   // Método para criar um novo usuário
   Future<void> createUser(LoginModelo user) async {
