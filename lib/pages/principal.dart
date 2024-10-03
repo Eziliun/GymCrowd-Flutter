@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gym_crowd/pages/introduction.dart';
+import 'package:gym_crowd/components/drawer.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
@@ -27,92 +27,33 @@ class Principal extends StatelessWidget {
           ),
         ),
       ),
-      drawer: SizedBox(
-        width: MediaQuery.of(context).size.width *
-            0.7, // Aumenta a largura do Drawer para 70% da tela
-        child: Drawer(
-          child: Column(
-            children: <Widget>[
-              // Adiciona espaçamento no topo da imagem
-              Padding(
-                padding: const EdgeInsets.only(
-                    top: 40.0), // Espaçamento de 16 pixels no topo
-                child: Container(
-                  width: double.infinity,
-                  height: 150, // Ajuste a altura conforme necessário
-                  decoration: const BoxDecoration(
-                    color: Colors.transparent,
+      drawer:  buildCustomDrawer(context),
+      body: FlutterMap(
+        options: const MapOptions(
+          initialCenter: LatLng(-3.801716, -38.497009),
+          initialZoom: 13.0, // Mudança: 'initialZoom' em vez de 'zoom'
+        ),
+        children: [
+          TileLayer(
+            urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+            subdomains: ['a', 'b', 'c'], // Usando tiles do OpenStreetMap
+          ),
+          const MarkerLayer(
+            markers: [
+              Marker(
+                point: LatLng(-3.801716, -38.497009),
+                width: 40,
+                height: 40,
+                child: Icon(
+                    Icons.location_on,  // Ícone de localização
+                    color: Colors.red,
+                    size: 40.0,        // Tamanho do ícone
                   ),
-                  child: Image.asset(
-                    'assets/GymCrowdLogo2.png', // Caminho para a imagem no diretório assets
-                    fit: BoxFit
-                        .cover, // Ajusta a imagem para cobrir o espaço disponível
-                  ),
-                ),
-              ),
-              const ListTile(
-                leading: Icon(Icons.person),
-                title: Text('Nome: Fulano de Tal'),
-              ),
-              const ListTile(
-                leading: Icon(Icons.email),
-                title: Text('Email: fulanodetal@gmail.com'),
-              ),
-              // Adicione mais itens conforme necessário
-              const Spacer(), // Empurra o botão para o final do Drawer
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFFF6000), // Cor laranja
-                    minimumSize: const Size(double.infinity,
-                        48), // Botão ocupa a largura disponível
-                  ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => IntroductionPage()),
-                    );
-                  },
-                  child: const Text(
-                    'Sair',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
               ),
             ],
           ),
-        ),
+        ],
       ),
-      body: FlutterMap(
-          options:MapOptions(
-            initialCenter: LatLng(-3.737454, -38.5393108), 
-            initialZoom: 13.0, // Mudança: 'initialZoom' em vez de 'zoom'
-          ),
-          children: [
-            TileLayer(
-              urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-              subdomains: ['a', 'b', 'c'], // Usando tiles do OpenStreetMap
-            ),
-          /*MarkerLayer(
-              markers: [
-                Marker(
-                  point: LatLng(51.505, -0.09),
-                  width: 80.0,
-                  height: 80.0,
-                  builder: (ctx) => Container(
-                    child: const Icon(
-                      Icons.location_on,
-                      color: Colors.red,
-                      size: 40.0,
-                    ),
-                  ),
-                ),
-              ],
-            ),*/
-          ],
-        ),
-      );
+    );
   }
 }
