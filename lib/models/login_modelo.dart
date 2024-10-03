@@ -1,34 +1,34 @@
 class LoginModelo {
-  String id;
-  String nome;
+  //String id;
+  String nome_usuario;
   String email;
   String cpf;
-  String senha;
+  String password;
 
   LoginModelo(
-      {required this.id,
-      required this.nome,
+      {//required this.id,
+      required this.nome_usuario,
       required this.email,
       required this.cpf,
-      required this.senha});
+      required this.password});
 
   factory LoginModelo.fromJson(Map<String, dynamic> json) {
     return LoginModelo(
-      id: json['id'], 
-      nome: json['nome'], 
+      //id: json['id'], 
+      nome_usuario: json['nome_usuario'], 
       email: json['email'], 
       cpf: json['cpf'], 
-      senha: json['senha'], 
+      password: json['password'], 
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id, 
-      'nome': nome, 
+      //'id': id, 
+      'nome_usuario': nome_usuario, 
       'email': email, 
       'cpf': cpf, 
-      'senha': senha 
+      'password': password 
     };
   }
 }

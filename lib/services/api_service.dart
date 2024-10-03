@@ -1,54 +1,63 @@
-/*import 'dart:convert'; // Para converter entre JSON e Map
-import 'package:http/http.dart' as http; // Pacote para fazer requisições HTTP
-import 'package:flutter_secure_storage/flutter_secure_storage.dart'; // Para armazenar dados de forma segura
-import '../models/login_modelo.dart'; // Importa o modelo de dados
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:gym_crowd/models/login_modelo.dart'; // Importe o model que você criou
 
-// Classe que lida com as requisições à API
 class ApiService {
-  final String baseUrl = 'https://suaapi.com'; // URL base da API
-  //final storage = FlutterSecureStorage(); // Instância para armazenar tokens de forma segura
+  // Base URL da API
+  final String baseUrl = 'http://192.168.0.13:5000';
 
-  // Função para registrar um usuário na API
-  Future<void> registerUser(LoginModelo user) async {
-    // Faz uma requisição POST para o endpoint de registro
-    final response = await http.post(
-      Uri.parse('$baseUrl/register'), // Monta a URL da API
-      headers: <String, String>{
-        'Content-Type': 'application/json', // Define o tipo de conteúdo como JSON
-      },
-      body: jsonEncode(user.toJson()),  // Converte o objeto user para JSON
-    );
+  // Método para criar um novo usuário
+  Future<void> createUser(LoginModelo user) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/register_user'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(user.toJson()),
+      );
 
-    // Verifica se o registro foi bem-sucedido
-    if (response.statusCode == 200) {
-      // Caso o status seja 200, o registro foi bem-sucedido
-      print('Usuário registrado com sucesso!');
-    } else {
-      // Caso contrário, ocorreu um erro
-      throw Exception('Erro ao registrar usuário');
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        print('Usuário criado com sucesso');
+      } else {
+        print('Erro ao criar usuário: ${response.body}');
+        throw Exception('Erro ao criar usuário: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Exceção capturada: $e');
+      throw Exception('Erro de conexão: $e');
     }
   }
 
-  // Função para fazer login na API
-  Future<void> login(String email, String senha) async {
-    // Faz uma requisição POST para o endpoint de login
+  // Método para fazer login
+Future<void> loginUser(String email, String password) async {
+  try {
+    // Monta o corpo da requisição com as credenciais
+    final Map<String, dynamic> loginData = {
+      'email': email,
+      'password': password,
+    };
+
+    // Faz a requisição POST para o endpoint de login
     final response = await http.post(
-      Uri.parse('$baseUrl/login'), // Monta a URL da API
-      headers: <String, String>{
-        'Content-Type': 'application/json', // Define o tipo de conteúdo como JSON
-      },
-      body: jsonEncode({'email': email, 'senha': senha}), // Converte email e senha para JSON
+      Uri.parse('$baseUrl/login_user'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(loginData),
     );
 
     // Verifica se o login foi bem-sucedido
     if (response.statusCode == 200) {
-      // Armazena o token de autenticação
-      var data = jsonDecode(response.body); // Converte o corpo da resposta para Map
-      await storage.write(key: 'token', value: data['token']); // Armazena o token de forma segura
-      print('Login realizado com sucesso!');
+      final responseData = jsonDecode(response.body);
+      print('Login bem-sucedido: ${responseData['message']}');
+
+      // Aqui você pode tratar a resposta, como salvar um token de autenticação
+      // ou redirecionar o usuário
     } else {
-      // Caso contrário, ocorreu um erro
-      throw Exception('Erro ao fazer login');
+      print('Erro ao fazer login: ${response.body}');
+      throw Exception('Erro ao fazer login: ${response.statusCode}');
     }
+  } catch (e) {
+    print('Exceção capturada: $e');
+    throw Exception('Erro de conexão: $e');
   }
-}*/
+}
+}
+
