@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gym_crowd/components/dialogAcad.dart';
 import 'package:gym_crowd/components/drawer.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -54,6 +55,25 @@ class Principal extends StatelessWidget {
           ),
         ],
       ),
+      // Código adicionado para incluir o FloatingActionButton
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          showAcademiaDialog(context); // Chama a função para exibir o dialog
+        },
+        backgroundColor: Colors.orange, // Cor de fundo laranja
+        child: Icon(Icons.add),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat, // Localização no canto inferior direito
+    );
+  }
+
+  // Função separada para exibir o AcademiaDialog
+  void showAcademiaDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AcademiaDialog(); // Exibe o componente AcademiaDialog
+      },
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gym_crowd/services/api_service.dart'; // Certifique-se de que o caminho esteja correto
 
 class AcademiaDialog extends StatefulWidget {
   @override
@@ -7,7 +8,24 @@ class AcademiaDialog extends StatefulWidget {
 
 class _AcademiaDialogState extends State<AcademiaDialog> {
   String? _selectedAcademia; // Valor selecionado no Dropdown
-  final List<String> academias = ['Academia A', 'Academia B', 'Academia C']; // Lista fixa
+  List<String> academias = []; // Lista para armazenar academias
+
+  @override
+  void initState() {
+    super.initState();
+    fetchAcademias(); // Chama a função para buscar as academias ao iniciar
+  }
+
+  Future<void> fetchAcademias() async {
+    ApiService apiService = ApiService();
+    try {
+      // Obtém as academias da API
+      academias = await apiService.fetchAcademias();
+      setState(() {}); // Atualiza o estado para refletir as academias carregadas
+    } catch (e) {
+      print('Erro ao buscar academias: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +33,7 @@ class _AcademiaDialogState extends State<AcademiaDialog> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20.0), // Bordas arredondadas
       ),
-      title: Center(
+      title: const Center(
         child: Text(
           'Selecione uma Academia',
           style: TextStyle(fontWeight: FontWeight.bold),

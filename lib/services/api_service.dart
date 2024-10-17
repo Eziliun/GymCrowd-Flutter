@@ -116,5 +116,34 @@ Future<Map<String, dynamic>?> fetchUserData() async {
     throw Exception('Erro de conexão ao buscar dados do usuário');
   }
 }
+
+ Future<List<String>> fetchAcademias() async {
+    try {
+      final response = await http.get(Uri.parse('$baseUrl/get_all_acads'));
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+
+        // Debug: Verifica a resposta da API
+        print(responseData);
+
+        // Popula a lista academias com os nomes das academias
+        List<String> academias = (responseData['Acads'] as List)
+            .map((item) => item['nome_fantasia'] ?? 'Sem Nome')
+            .toList()
+            .cast<String>();
+        
+        // Debug: Verifica se as academias foram carregadas
+        print(academias);
+        return academias; // Retorna a lista de academias
+      } else {
+        throw Exception('Falha ao carregar as academias');
+      }
+    } catch (e) {
+      print('Erro ao buscar academias: $e');
+      throw Exception('Erro de conexão ao buscar academias');
+    }
+  }
+
 }
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gym_crowd/pages/principal.dart';
-import 'package:gym_crowd/services/api_service.dart'; // Importe o ApiService
+import 'package:gym_crowd/services/api_service.dart'; 
 
 class Login extends StatefulWidget {
   const Login({super.key});
