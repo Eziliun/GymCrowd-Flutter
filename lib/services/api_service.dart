@@ -8,16 +8,17 @@ class ApiService {
   final String baseUrl = 'http://192.168.0.13:5000';
 
   // Método para salvar o token no armazenamento local
-  Future<void> _saveToken(String token) async {
+  Future<void> saveToken(String token) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('auth_token', token);
   }
 
   // Método para buscar o token salvo
-  Future<String?> _getToken() async {
+  Future<String?> getToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString('auth_token');
   }
+
 
   // Método para criar um novo usuário
   Future<void> createUser(LoginModelo user) async {
@@ -59,10 +60,15 @@ Future<void> loginUser(String email, String password) async {
     // Verifica se o login foi bem-sucedido
     if (response.statusCode == 200) {
       final responseData = jsonDecode(response.body);
+      final token = responseData['token'];  
+      final nomeUsuario = responseData['nome_usuario']; // Extraído da resposta
+      final userEmail = responseData['email']; // Extraído da resposta
+      
+      // Salva os dados do usuário e o token
+      await saveToken(token);
+      await saveUserData(nomeUsuario, userEmail); // Salva o nome de usuário e email
+      print(token);
       print('Login bem-sucedido: ${responseData['message']}');
-
-      // Aqui você pode tratar a resposta, como salvar um token de autenticação
-      // ou redirecionar o usuário
     } else {
       print('Erro ao fazer login: ${response.body}');
       throw Exception('Erro ao fazer login: ${response.statusCode}');
@@ -70,6 +76,44 @@ Future<void> loginUser(String email, String password) async {
   } catch (e) {
     print('Exceção capturada: $e');
     throw Exception('Erro de conexão: $e');
+  }
+}
+
+// Método para salvar os dados do usuário no armazenamento local
+Future<void> saveUserData(String nomeUsuario, String email) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.setString('nome_usuario', nomeUsuario);
+  await prefs.setString('email', email);
+}
+
+// Método para buscar os dados do usuário logado
+Future<Map<String, dynamic>?> fetchUserData() async {
+  final token = await getToken();
+  if (token == null) {
+    print('Token não encontrado, usuário não está autenticado.');
+    return null;
+  }
+
+  try {
+    final response = await http.get(
+      Uri.parse('$baseUrl/user'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token', // Envia o token para autenticação
+      },
+    );
+
+    if (response.statusCode == 200) {
+      // Retorna os dados do usuário
+      return jsonDecode(response.body);
+    } else {
+      // Exibe mais detalhes em caso de erro
+      print('Erro ao buscar dados do usuário: ${response.statusCode} - ${response.body}');
+      throw Exception('Falha ao carregar os dados do usuário: ${response.statusCode}');
+    }
+  } catch (e) {
+    print('Exceção ao buscar dados do usuário: $e');
+    throw Exception('Erro de conexão ao buscar dados do usuário');
   }
 }
 }
