@@ -6,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 Future<void> saveUserData(String token, String nomeUsuario, String email) async {
   final prefs = await SharedPreferences.getInstance();
   await prefs.setString('auth_token', token);
-  await prefs.setString('nome_usuario', nomeUsuario);  // Corrigi a chave aqui para refletir o campo da API
+  await prefs.setString('nome_usuario', nomeUsuario);  
   await prefs.setString('email', email);
 }
 
@@ -14,7 +14,7 @@ Future<void> saveUserData(String token, String nomeUsuario, String email) async 
 Future<void> removeToken() async {
   final prefs = await SharedPreferences.getInstance();
   await prefs.remove('auth_token');
-  await prefs.remove('nome_usuario');  // Ajuste do nome da chave
+  await prefs.remove('nome_usuario');  
   await prefs.remove('email');
 }
 
@@ -22,7 +22,7 @@ Future<void> removeToken() async {
 Future<Map<String, String?>> getUserData() async {
   try {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    final nome = prefs.getString('nome_usuario');  // Ajuste do nome da chave
+    final nome = prefs.getString('nome_usuario');  
     final email = prefs.getString('email');
     return {'nome': nome, 'email': email};
   } catch (e) {
