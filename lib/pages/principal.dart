@@ -28,11 +28,11 @@ class Principal extends StatelessWidget {
           ),
         ),
       ),
-      drawer:  buildCustomDrawer(context),
+      drawer: buildCustomDrawer(context),
       body: FlutterMap(
         options: const MapOptions(
           initialCenter: LatLng(-3.801716, -38.497009),
-          initialZoom: 13.0, // Mudança: 'initialZoom' em vez de 'zoom'
+          initialZoom: 13.0,
         ),
         children: [
           TileLayer(
@@ -46,10 +46,10 @@ class Principal extends StatelessWidget {
                 width: 40,
                 height: 40,
                 child: Icon(
-                    Icons.location_on,  // Ícone de localização
-                    color: Colors.red,
-                    size: 40.0,        // Tamanho do ícone
-                  ),
+                  Icons.location_on, // Ícone de localização
+                  color: Colors.red,
+                  size: 40.0, // Tamanho do ícone
+                ),
               ),
             ],
           ),
@@ -60,10 +60,11 @@ class Principal extends StatelessWidget {
         onPressed: () {
           showAcademiaDialog(context); // Chama a função para exibir o dialog
         },
-        backgroundColor: Colors.orange, // Cor de fundo laranja
-        child: Icon(Icons.add),
+        backgroundColor: const Color(0xFFFF6000), // Cor de fundo laranja
+        child: const Icon(Icons.add, color: Colors.white),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat, // Localização no canto inferior direito
+      floatingActionButtonLocation: FloatingActionButtonLocation
+          .endFloat, // Localização no canto inferior direito
     );
   }
 
