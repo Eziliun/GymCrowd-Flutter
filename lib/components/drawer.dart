@@ -3,10 +3,11 @@ import 'package:gym_crowd/pages/introduction.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // Método para salvar os dados do login no SharedPreferences
-Future<void> saveUserData(String token, String nomeUsuario, String email) async {
+Future<void> saveUserData(
+    String token, String nomeUsuario, String email) async {
   final prefs = await SharedPreferences.getInstance();
   await prefs.setString('auth_token', token);
-  await prefs.setString('nome_usuario', nomeUsuario);  
+  await prefs.setString('nome_usuario', nomeUsuario);
   await prefs.setString('email', email);
 }
 
@@ -14,7 +15,7 @@ Future<void> saveUserData(String token, String nomeUsuario, String email) async 
 Future<void> removeToken() async {
   final prefs = await SharedPreferences.getInstance();
   await prefs.remove('auth_token');
-  await prefs.remove('nome_usuario');  
+  await prefs.remove('nome_usuario');
   await prefs.remove('email');
 }
 
@@ -22,7 +23,7 @@ Future<void> removeToken() async {
 Future<Map<String, String?>> getUserData() async {
   try {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    final nome = prefs.getString('nome_usuario');  
+    final nome = prefs.getString('nome_usuario');
     final email = prefs.getString('email');
     return {'nome': nome, 'email': email};
   } catch (e) {
@@ -87,10 +88,46 @@ Widget buildCustomDrawer(BuildContext context) {
                     minimumSize: const Size(double.infinity, 48),
                   ),
                   onPressed: () async {
-                    await removeToken();
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => IntroductionPage()),
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Center(child: Text("Confirmação")),
+                          content: const Column(
+                            mainAxisSize:
+                                MainAxisSize.min, // Limita a altura ao conteúdo
+                            children: const [
+                              Text("Você realmente deseja sair?"),
+                            ],
+                          ),
+                          actionsAlignment: MainAxisAlignment.center,
+                          actions: [
+                            TextButton(
+                              style: TextButton.styleFrom(foregroundColor: Colors.black,),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: const Text("Não"),
+                            ),
+                            TextButton(
+                              child: const Text("Sim"),
+                              style: TextButton.styleFrom(
+                                backgroundColor: const Color(0xFFFF6000),
+                                foregroundColor: Colors.white,
+                              ),
+                              onPressed: () async {
+                                await removeToken();
+                                Navigator.of(context).pop();
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => IntroductionPage()),
+                                );
+                              },
+                            ),
+                          ],
+                        );
+                      },
                     );
                   },
                   child: const Text(

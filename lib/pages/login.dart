@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gym_crowd/pages/principal.dart';
-import 'package:gym_crowd/services/api_service.dart'; 
+import 'package:gym_crowd/services/api_service.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -21,12 +21,12 @@ class _LoginState extends State<Login> {
   void _showLoadingDialog() {
     showDialog(
       context: context,
-      barrierDismissible: false, 
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return const Center(
           child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(Colors.orange), 
-          ), 
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.orange),
+          ),
         );
       },
     );
@@ -34,7 +34,7 @@ class _LoginState extends State<Login> {
 
   // Fecha o diálogo de carregamento
   void _hideLoadingDialog() {
-    Navigator.pop(context); 
+    Navigator.pop(context);
   }
 
   Future<void> _loginUser() async {
@@ -51,7 +51,7 @@ class _LoginState extends State<Login> {
           _passwordController.text.trim(),
         );
 
-        _hideLoadingDialog(); 
+        _hideLoadingDialog();
 
         // Redireciona para a página principal em caso de sucesso
         Navigator.pushReplacement(
@@ -59,7 +59,7 @@ class _LoginState extends State<Login> {
           MaterialPageRoute(builder: (context) => const Principal()),
         );
       } catch (e) {
-        _hideLoadingDialog(); 
+        _hideLoadingDialog();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Erro ao fazer login: $e')),
         );
@@ -84,6 +84,9 @@ class _LoginState extends State<Login> {
         ),
         centerTitle: true,
         backgroundColor: const Color(0xFFFF6000),
+        iconTheme: const IconThemeData(
+          color: Colors.white, // Define a cor do ícone para branco
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -142,7 +145,7 @@ class _LoginState extends State<Login> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    onPressed: _isLoading ? null : _loginUser, 
+                    onPressed: _isLoading ? null : _loginUser,
                     child: const Text(
                       'Entrar',
                       style: TextStyle(color: Colors.white),

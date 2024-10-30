@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gym_crowd/services/api_service.dart'; // Importe o ApiService
-import 'package:gym_crowd/models/login_modelo.dart';       // Importe o User model
+import 'package:gym_crowd/models/login_modelo.dart'; // Importe o User model
 
 class Register extends StatefulWidget {
   const Register({super.key});
@@ -15,7 +15,8 @@ class _RegisterState extends State<Register> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _cpfController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
   final ApiService apiService = ApiService(); // Instância do ApiService
   final _formKey = GlobalKey<FormState>(); // Chave para o formulário
@@ -32,12 +33,10 @@ class _RegisterState extends State<Register> {
 
       // Criar o objeto User com os dados do formulário
       LoginModelo newUser = LoginModelo(
-        nome_usuario: _usernameController.text,
-        email: _emailController.text,
-        cpf: _cpfController.text,
-        password: _confirmPasswordController.text
-
-      );
+          nome_usuario: _usernameController.text,
+          email: _emailController.text,
+          cpf: _cpfController.text,
+          password: _confirmPasswordController.text);
 
       try {
         // Chamar a função de criação de usuário na API
@@ -45,6 +44,9 @@ class _RegisterState extends State<Register> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Usuário cadastrado com sucesso!')),
         );
+
+        // Volte para a página de login após o registro bem-sucedido
+        Navigator.pop(context);
         // Limpar os campos após o cadastro bem-sucedido
         _usernameController.clear();
         _emailController.clear();
@@ -72,6 +74,9 @@ class _RegisterState extends State<Register> {
         ),
         centerTitle: true,
         backgroundColor: const Color(0xFFFF6000),
+        iconTheme: const IconThemeData(
+          color: Colors.white,
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart'; // Importe o model 
 
 class ApiService {
   // Base URL da API
-  final String baseUrl = 'http://192.168.0.13:5000';
+  final String baseUrl = 'http://192.168.135.191:5000';
 
   // Método para salvar o token no armazenamento local
   Future<void> saveToken(String token) async {
