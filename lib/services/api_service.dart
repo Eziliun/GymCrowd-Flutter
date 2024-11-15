@@ -1,11 +1,12 @@
 import 'dart:convert';
+import 'package:gym_crowd/models/academia_modelo.dart';
 import 'package:http/http.dart' as http;
 import 'package:gym_crowd/models/login_modelo.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // Importe o model que você criou
 
 class ApiService {
   // Base URL da API
-  final String baseUrl = 'http://192.168.135.191:5000';
+  final String baseUrl = 'http://192.168.0.16:5000';
 
   // Método para salvar o token no armazenamento local
   Future<void> saveToken(String token) async {
@@ -117,33 +118,32 @@ Future<Map<String, dynamic>?> fetchUserData() async {
   }
 }
 
- Future<List<String>> fetchAcademias() async {
-    try {
-      final response = await http.get(Uri.parse('$baseUrl/get_all_acads'));
+ Future<List<AcademiaModelo>> fetchAcademias() async {
+  try {
+    final response = await http.get(Uri.parse('$baseUrl/get_all_acads'));
 
-      if (response.statusCode == 200) {
-        final responseData = jsonDecode(response.body);
+    if (response.statusCode == 200) {
+      final responseData = jsonDecode(response.body);
 
-        // Debug: Verifica a resposta da API
-        print(responseData);
+      // Debug: Verifica a resposta da API
+      print(responseData);
 
-        // Popula a lista academias com os nomes das academias
-        List<String> academias = (responseData['Acads'] as List)
-            .map((item) => item['nome_fantasia'] ?? 'Sem Nome')
-            .toList()
-            .cast<String>();
-        
-        // Debug: Verifica se as academias foram carregadas
-        print(academias);
-        return academias; // Retorna a lista de academias
-      } else {
-        throw Exception('Falha ao carregar as academias');
-      }
-    } catch (e) {
-      print('Erro ao buscar academias: $e');
-      throw Exception('Erro de conexão ao buscar academias');
+      // Popula a lista academias com objetos AcademiaModelo
+      List<AcademiaModelo> academias = (responseData['Acads'] as List)
+          .map((item) => AcademiaModelo.fromJson(item))
+          .toList();
+      
+      // Debug: Verifica se as academias foram carregadas
+      print(academias);
+      return academias; // Retorna a lista de objetos AcademiaModelo
+    } else {
+      throw Exception('Falha ao carregar as academias');
     }
+  } catch (e) {
+    print('Erro ao buscar academias: $e');
+    throw Exception('Erro de conexão ao buscar academias');
   }
+}
 
 }
 
