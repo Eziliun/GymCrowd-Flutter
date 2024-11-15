@@ -4,6 +4,8 @@ import 'package:gym_crowd/components/drawer.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:gym_crowd/services/api_service.dart'; // Importe o ApiService
+import 'package:gym_crowd/models/academia_modelo.dart';
 
 class Principal extends StatefulWidget {
   const Principal({super.key});
@@ -14,22 +16,35 @@ class Principal extends StatefulWidget {
 
 class _PrincipalState extends State<Principal> {
   LatLng? _currentLocation;
+  List<LatLng> academiasLocations = [];
+  final ApiService apiService = ApiService();
 
   @override
   void initState() {
     super.initState();
     _getCurrentLocation();
+    _fetchAcademiaLocations();
   }
 
-  // Função para obter a localização atual
+  Future<void> _fetchAcademiaLocations() async {
+    try {
+      List<AcademiaModelo> academias = await apiService.fetchAcademias();
+      setState(() {
+        academiasLocations = academias
+            .map((academia) => LatLng(academia.latitude, academia.longitude))
+            .toList();
+      });
+    } catch (e) {
+      print('Erro ao buscar localizações de academias: $e');
+    }
+  }
+
   Future<void> _getCurrentLocation() async {
     bool serviceEnabled;
     LocationPermission permission;
 
-    // Verifica se o serviço de localização está habilitado
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      // Serviço de localização não habilitado, mostra um alerta para o usuário
       _showLocationAlert(
         'Serviço de localização desativado',
         'Por favor, ative o serviço de localização do dispositivo.',
@@ -37,13 +52,10 @@ class _PrincipalState extends State<Principal> {
       return;
     }
 
-    // Verifica o estado da permissão de localização
     permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
-      // Solicita a permissão de localização
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        // Permissão negada, mostra um alerta para o usuário
         _showLocationAlert(
           'Permissão negada',
           'O aplicativo precisa da sua permissão para acessar a localização.',
@@ -53,7 +65,6 @@ class _PrincipalState extends State<Principal> {
     }
 
     if (permission == LocationPermission.deniedForever) {
-      // Se a permissão for negada permanentemente, mostra um alerta
       _showLocationAlert(
         'Permissão negada permanentemente',
         'Por favor, permita o acesso à localização nas configurações do dispositivo.',
@@ -61,13 +72,10 @@ class _PrincipalState extends State<Principal> {
       return;
     }
 
-    // Obtém a localização atual do dispositivo
     try {
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
-
-      // Atualiza o estado com a localização atual
       setState(() {
         _currentLocation = LatLng(position.latitude, position.longitude);
       });
@@ -76,7 +84,6 @@ class _PrincipalState extends State<Principal> {
     }
   }
 
-  // Função para mostrar um alerta
   void _showLocationAlert(String title, String message) {
     showDialog(
       context: context,
@@ -146,6 +153,17 @@ class _PrincipalState extends State<Principal> {
                         size: 40.0, // Tamanho do ícone
                       ),
                     ),
+                    for (var location in academiasLocations)
+                      Marker(
+                        point: location,
+                        width: 40,
+                        height: 40,
+                        child: const Icon(
+                          Icons.location_on,
+                          color: Colors.blue,
+                          size: 40.0,
+                        ),
+                      ),
                   ],
                 ),
               ],

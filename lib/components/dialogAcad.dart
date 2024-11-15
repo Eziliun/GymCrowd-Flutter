@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gym_crowd/models/academia_modelo.dart';
 import 'package:gym_crowd/services/api_service.dart'; // Certifique-se de que o caminho esteja correto
 
 class AcademiaDialog extends StatefulWidget {
@@ -7,8 +8,8 @@ class AcademiaDialog extends StatefulWidget {
 }
 
 class _AcademiaDialogState extends State<AcademiaDialog> {
-  String? _selectedAcademia; // Valor selecionado no Dropdown
-  List<String> academias = []; // Lista para armazenar academias
+  AcademiaModelo? _selectedAcademia; // Valor selecionado no Dropdown
+  List<AcademiaModelo> academias = []; // Lista para armazenar academias
 
   @override
   void initState() {
@@ -19,7 +20,7 @@ class _AcademiaDialogState extends State<AcademiaDialog> {
   Future<void> fetchAcademias() async {
     ApiService apiService = ApiService();
     try {
-      // Obtém as academias da API
+      // Obtém as academias da API como uma lista de AcademiaModelo
       academias = await apiService.fetchAcademias();
       setState(() {}); // Atualiza o estado para refletir as academias carregadas
     } catch (e) {
@@ -41,14 +42,14 @@ class _AcademiaDialogState extends State<AcademiaDialog> {
       ),
       content: SizedBox(
         height: 100, // Ajuste conforme necessário
-        child: DropdownButton<String>(
+        child: DropdownButton<AcademiaModelo>(
           isExpanded: true,
           value: _selectedAcademia,
-          hint: Text('Escolha uma academia'),
+          hint: const Text('Escolha uma academia'),
           items: academias.map((academia) {
-            return DropdownMenuItem<String>(
+            return DropdownMenuItem<AcademiaModelo>(
               value: academia,
-              child: Text(academia),
+              child: Text(academia.nome_fantasia),
             );
           }).toList(),
           onChanged: (value) {
