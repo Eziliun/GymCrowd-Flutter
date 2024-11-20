@@ -4,7 +4,7 @@ class AcademiaModelo {
   String endereco;
   double latitude;
   double longitude;
-  String lotacao;
+  int lotacao;
   String nome_fantasia;
 
   AcademiaModelo(
