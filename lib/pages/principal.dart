@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gym_crowd/components/academiaDetails.dart';
 import 'package:gym_crowd/components/dialogAcad.dart';
 import 'package:gym_crowd/components/drawer.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -16,8 +17,10 @@ class Principal extends StatefulWidget {
 
 class _PrincipalState extends State<Principal> {
   LatLng? _currentLocation;
-  List<LatLng> academiasLocations = [];
+  List<Map<String, dynamic>> academiasLocations = [];
   final ApiService apiService = ApiService();
+  MapController mapController = MapController();
+
 
   @override
   void initState() {
@@ -30,9 +33,14 @@ class _PrincipalState extends State<Principal> {
     try {
       List<AcademiaModelo> academias = await apiService.fetchAcademias();
       setState(() {
-        academiasLocations = academias
-            .map((academia) => LatLng(academia.latitude, academia.longitude))
-            .toList();
+        academiasLocations = academias.map((academia) {
+          return {
+            'location': LatLng(academia.latitude, academia.longitude),
+            'nome': academia.nome_fantasia,
+            'lotacao': academia.lotacao, // Nome da academia
+            'endereco': academia.endereco, // Endereço da academia
+          };
+        }).toList();
       });
     } catch (e) {
       print('Erro ao buscar localizações de academias: $e');
@@ -117,7 +125,8 @@ class _PrincipalState extends State<Principal> {
         centerTitle: true, // Centraliza a imagem na AppBar
         leading: Builder(
           builder: (context) => IconButton(
-            icon: const Icon(Icons.menu, color: Colors.white), // Ícone "hamburguer" branco
+            icon: const Icon(Icons.menu,
+                color: Colors.white), // Ícone "hamburguer" branco
             onPressed: () {
               Scaffold.of(context).openDrawer();
             },
@@ -128,17 +137,20 @@ class _PrincipalState extends State<Principal> {
       body: _currentLocation == null
           ? const Center(
               child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFF6000)), // Cor laranja
+                valueColor: AlwaysStoppedAnimation<Color>(
+                    Color(0xFFFF6000)), // Cor laranja
               ),
             ) // Mostra indicador de carregamento com cor laranja
           : FlutterMap(
+            mapController: mapController,
               options: MapOptions(
                 initialCenter: _currentLocation!,
                 initialZoom: 13.0,
               ),
               children: [
                 TileLayer(
-                  urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                  urlTemplate:
+                      'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
                   subdomains: ['a', 'b', 'c'], // Usando tiles do OpenStreetMap
                 ),
                 MarkerLayer(
@@ -155,13 +167,21 @@ class _PrincipalState extends State<Principal> {
                     ),
                     for (var location in academiasLocations)
                       Marker(
-                        point: location,
+                        point: location['location'],
                         width: 40,
                         height: 40,
-                        child: const Icon(
-                          Icons.location_on,
-                          color: Colors.blue,
-                          size: 40.0,
+                        child: GestureDetector(
+                          onTap: () {
+                            _showAcademiaDetails(context,
+                                location); // Mostra o modal com os detalhes da academia
+                            mapController.move(location['location'], 14);
+                            
+                          },
+                          child: const Icon(
+                            Icons.location_on,
+                            color: Colors.blue,
+                            size: 40.0,
+                          ),
                         ),
                       ),
                   ],
@@ -189,3 +209,17 @@ class _PrincipalState extends State<Principal> {
     );
   }
 }
+
+void _showAcademiaDetails(BuildContext context, Map<String, dynamic> academia) {
+  showModalBottomSheet(
+    context: context,
+    builder: (BuildContext context) {
+      return AcademiaDetailsBottomSheet(
+        nome: academia['nome'],
+        endereco: academia['endereco'],
+        lotacao: academia['lotacao'], // Passa a lotação para o componente
+      );
+    },
+  );
+}
+
