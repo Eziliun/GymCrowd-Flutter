@@ -21,7 +21,6 @@ class _PrincipalState extends State<Principal> {
   final ApiService apiService = ApiService();
   MapController mapController = MapController();
 
-
   @override
   void initState() {
     super.initState();
@@ -37,8 +36,8 @@ class _PrincipalState extends State<Principal> {
           return {
             'location': LatLng(academia.latitude, academia.longitude),
             'nome': academia.nome_fantasia,
-            'lotacao': academia.lotacao, // Nome da academia
-            'endereco': academia.endereco, // Endereço da academia
+            'lotacao': academia.lotacao, 
+            'endereco': academia.endereco, 
           };
         }).toList();
       });
@@ -142,7 +141,7 @@ class _PrincipalState extends State<Principal> {
               ),
             ) // Mostra indicador de carregamento com cor laranja
           : FlutterMap(
-            mapController: mapController,
+              mapController: mapController,
               options: MapOptions(
                 initialCenter: _currentLocation!,
                 initialZoom: 13.0,
@@ -157,30 +156,87 @@ class _PrincipalState extends State<Principal> {
                   markers: [
                     Marker(
                       point: _currentLocation!,
-                      width: 40,
-                      height: 40,
-                      child: const Icon(
-                        Icons.location_on, // Ícone de localização
-                        color: Colors.red,
-                        size: 40.0, // Tamanho do ícone
+                      width: 50, 
+                      height: 50, 
+                      child: GestureDetector(
+                        onTap: () {
+                          // Ação ao clicar no marcador
+                          print("Marcador da localização atual clicado!");
+                        },
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Container(
+                              width: 50,
+                              height: 50,
+                              decoration: BoxDecoration(
+                                color: Colors.red.withOpacity(
+                                    0.8), // Fundo semi-transparente
+                                shape: BoxShape.circle, // Formato circular
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black
+                                        .withOpacity(0.3), // Sombra leve
+                                    blurRadius: 6,
+                                    offset: const Offset(0, 3),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const Icon(
+                              Icons
+                                  .person, // Ícone de localização mais tradicional
+                              color: Colors.white, // Cor do ícone
+                              size: 30, // Tamanho do ícone
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                     for (var location in academiasLocations)
                       Marker(
                         point: location['location'],
-                        width: 40,
-                        height: 40,
+                        width: 50, 
+                        height: 50, 
                         child: GestureDetector(
                           onTap: () {
                             _showAcademiaDetails(context,
-                                location); // Mostra o modal com os detalhes da academia
-                            mapController.move(location['location'], 14);
-                            
+                                location); 
+                            mapController.move(location['location'],
+                                14); 
                           },
-                          child: const Icon(
-                            Icons.location_on,
-                            color: Colors.blue,
-                            size: 40.0,
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              Container(
+                                width: 50,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  color: Colors.blue.withOpacity(
+                                      0.8), // Fundo semi-transparente azul
+                                  shape: BoxShape.circle, // Formato circular
+                                  border: Border.all(
+                                    color: Colors
+                                        .white, // Borda branca para destaque
+                                    width: 2.0,
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black
+                                          .withOpacity(0.3), // Sombra leve
+                                      blurRadius: 6,
+                                      offset: const Offset(0, 3),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const Icon(
+                                Icons
+                                    .fitness_center, // Ícone relacionado à academia
+                                color: Colors.white, // Cor do ícone
+                                size: 30, // Tamanho do ícone
+                              ),
+                            ],
                           ),
                         ),
                       ),
@@ -188,12 +244,30 @@ class _PrincipalState extends State<Principal> {
                 ),
               ],
             ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          showAcademiaDialog(context); // Chama a função para exibir o dialog
-        },
-        backgroundColor: const Color(0xFFFF6000), // Cor de fundo laranja
-        child: const Icon(Icons.add, color: Colors.white),
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          // Botão de redefinir zoom
+          FloatingActionButton(
+            heroTag: 'resetZoom',
+            onPressed: () {
+              mapController.move(
+                  _currentLocation!, 13.0); // Volta ao zoom inicial
+            },
+            backgroundColor: const Color(0xFFFF6000),
+            child: const Icon(Icons.zoom_out_map, color: Colors.white),
+          ),
+          const SizedBox(height: 16), // Espaço entre os botões
+          // Botão existente
+          FloatingActionButton(
+            heroTag: 'addAcademia',
+            onPressed: () {
+              showAcademiaDialog(context);
+            },
+            backgroundColor: const Color(0xFFFF6000),
+            child: const Icon(Icons.add, color: Colors.white),
+          ),
+        ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
@@ -222,4 +296,3 @@ void _showAcademiaDetails(BuildContext context, Map<String, dynamic> academia) {
     },
   );
 }
-
