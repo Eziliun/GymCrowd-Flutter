@@ -26,10 +26,7 @@ class IntroductionPage extends StatelessWidget {
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const Register()),
-                    );
+                    _navigateWithAnimation(context, const Register());
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFFF6000),
@@ -46,10 +43,7 @@ class IntroductionPage extends StatelessWidget {
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const Login()),
-                    );
+                    _navigateWithAnimation(context, const Login());
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFFFFFFF),
@@ -67,6 +61,28 @@ class IntroductionPage extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  void _navigateWithAnimation(BuildContext context, Widget page) {
+    Navigator.push(
+      context,
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) => page,
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          const begin = Offset(1.0, 0.0); // Começa da direita
+          const end = Offset.zero;        // Termina no centro
+          const curve = Curves.easeInOut; // Transição suave
+
+          var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+          var offsetAnimation = animation.drive(tween);
+
+          return SlideTransition(
+            position: offsetAnimation,
+            child: child,
+          );
+        },
       ),
     );
   }

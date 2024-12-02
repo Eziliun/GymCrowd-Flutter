@@ -20,6 +20,7 @@ class _PrincipalState extends State<Principal> {
   List<Map<String, dynamic>> academiasLocations = [];
   final ApiService apiService = ApiService();
   MapController mapController = MapController();
+  bool _isLoading = false; // Variável para gerenciar o estado de carregamento
 
   @override
   void initState() {
@@ -29,6 +30,10 @@ class _PrincipalState extends State<Principal> {
   }
 
   Future<void> _fetchAcademiaLocations() async {
+    setState(() {
+      _isLoading = true; // Inicia o carregamento
+    });
+
     try {
       List<AcademiaModelo> academias = await apiService.fetchAcademias();
       setState(() {
@@ -36,13 +41,17 @@ class _PrincipalState extends State<Principal> {
           return {
             'location': LatLng(academia.latitude, academia.longitude),
             'nome': academia.nome_fantasia,
-            'lotacao': academia.lotacao, 
-            'endereco': academia.endereco, 
+            'lotacao': academia.lotacao,
+            'endereco': academia.endereco,
           };
         }).toList();
       });
     } catch (e) {
       print('Erro ao buscar localizações de academias: $e');
+    } finally {
+      setState(() {
+        _isLoading = false; // Finaliza o carregamento
+      });
     }
   }
 
@@ -111,35 +120,63 @@ class _PrincipalState extends State<Principal> {
     );
   }
 
+  void _showAcademiaDetails(BuildContext context, Map<String, dynamic> academia) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return AcademiaDetailsBottomSheet(
+          nome: academia['nome'],
+          endereco: academia['endereco'],
+          lotacao: academia['lotacao'],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: 100, // Define a altura da AppBar para acomodar a imagem
+        toolbarHeight: 100,
         backgroundColor: const Color(0xFFFF6000),
         title: Image.asset(
-          'assets/GymCrowdLogoWhite.png', // Caminho para a imagem no diretório assets
-          height: 80, // Define a altura da imagem
+          'assets/GymCrowdLogoWhite.png',
+          height: 80,
         ),
-        centerTitle: true, // Centraliza a imagem na AppBar
+        centerTitle: true,
         leading: Builder(
           builder: (context) => IconButton(
-            icon: const Icon(Icons.menu,
-                color: Colors.white), // Ícone "hamburguer" branco
+            icon: const Icon(Icons.menu, color: Colors.white),
             onPressed: () {
               Scaffold.of(context).openDrawer();
             },
           ),
         ),
+        actions: [
+          _isLoading
+              ? const Padding(
+                  padding: EdgeInsets.only(right: 16),
+                  child: Center(
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                    ),
+                  ),
+                )
+              : IconButton(
+                  icon: const Icon(Icons.refresh, color: Colors.white),
+                  onPressed: () async {
+                    await _fetchAcademiaLocations(); // Atualiza a lista de academias
+                  },
+                ),
+        ],
       ),
       drawer: buildCustomDrawer(context),
       body: _currentLocation == null
           ? const Center(
               child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(
-                    Color(0xFFFF6000)), // Cor laranja
+                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFF6000)),
               ),
-            ) // Mostra indicador de carregamento com cor laranja
+            )
           : FlutterMap(
               mapController: mapController,
               options: MapOptions(
@@ -150,17 +187,16 @@ class _PrincipalState extends State<Principal> {
                 TileLayer(
                   urlTemplate:
                       'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                  subdomains: ['a', 'b', 'c'], // Usando tiles do OpenStreetMap
+                  subdomains: ['a', 'b', 'c'],
                 ),
                 MarkerLayer(
                   markers: [
                     Marker(
                       point: _currentLocation!,
-                      width: 50, 
-                      height: 50, 
+                      width: 50,
+                      height: 50,
                       child: GestureDetector(
                         onTap: () {
-                          // Ação ao clicar no marcador
                           print("Marcador da localização atual clicado!");
                         },
                         child: Stack(
@@ -170,13 +206,11 @@ class _PrincipalState extends State<Principal> {
                               width: 50,
                               height: 50,
                               decoration: BoxDecoration(
-                                color: Colors.red.withOpacity(
-                                    0.8), // Fundo semi-transparente
-                                shape: BoxShape.circle, // Formato circular
+                                color: Colors.red.withOpacity(0.8),
+                                shape: BoxShape.circle,
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black
-                                        .withOpacity(0.3), // Sombra leve
+                                    color: Colors.black.withOpacity(0.3),
                                     blurRadius: 6,
                                     offset: const Offset(0, 3),
                                   ),
@@ -184,10 +218,9 @@ class _PrincipalState extends State<Principal> {
                               ),
                             ),
                             const Icon(
-                              Icons
-                                  .person, // Ícone de localização mais tradicional
-                              color: Colors.white, // Cor do ícone
-                              size: 30, // Tamanho do ícone
+                              Icons.person,
+                              color: Colors.white,
+                              size: 30,
                             ),
                           ],
                         ),
@@ -196,14 +229,12 @@ class _PrincipalState extends State<Principal> {
                     for (var location in academiasLocations)
                       Marker(
                         point: location['location'],
-                        width: 50, 
-                        height: 50, 
+                        width: 50,
+                        height: 50,
                         child: GestureDetector(
                           onTap: () {
-                            _showAcademiaDetails(context,
-                                location); 
-                            mapController.move(location['location'],
-                                14); 
+                            _showAcademiaDetails(context, location);
+                            mapController.move(location['location'], 14);
                           },
                           child: Stack(
                             alignment: Alignment.center,
@@ -212,18 +243,15 @@ class _PrincipalState extends State<Principal> {
                                 width: 50,
                                 height: 50,
                                 decoration: BoxDecoration(
-                                  color: Colors.blue.withOpacity(
-                                      0.8), // Fundo semi-transparente azul
-                                  shape: BoxShape.circle, // Formato circular
+                                  color: Colors.blue.withOpacity(0.8),
+                                  shape: BoxShape.circle,
                                   border: Border.all(
-                                    color: Colors
-                                        .white, // Borda branca para destaque
+                                    color: Colors.white,
                                     width: 2.0,
                                   ),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.black
-                                          .withOpacity(0.3), // Sombra leve
+                                      color: Colors.black.withOpacity(0.3),
                                       blurRadius: 6,
                                       offset: const Offset(0, 3),
                                     ),
@@ -231,10 +259,9 @@ class _PrincipalState extends State<Principal> {
                                 ),
                               ),
                               const Icon(
-                                Icons
-                                    .fitness_center, // Ícone relacionado à academia
-                                color: Colors.white, // Cor do ícone
-                                size: 30, // Tamanho do ícone
+                                Icons.fitness_center,
+                                color: Colors.white,
+                                size: 30,
                               ),
                             ],
                           ),
@@ -247,18 +274,15 @@ class _PrincipalState extends State<Principal> {
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          // Botão de redefinir zoom
           FloatingActionButton(
             heroTag: 'resetZoom',
             onPressed: () {
-              mapController.move(
-                  _currentLocation!, 13.0); // Volta ao zoom inicial
+              mapController.move(_currentLocation!, 13.0);
             },
             backgroundColor: const Color(0xFFFF6000),
             child: const Icon(Icons.zoom_out_map, color: Colors.white),
           ),
-          const SizedBox(height: 16), // Espaço entre os botões
-          // Botão existente
+          const SizedBox(height: 16),
           FloatingActionButton(
             heroTag: 'addAcademia',
             onPressed: () {
@@ -273,26 +297,12 @@ class _PrincipalState extends State<Principal> {
     );
   }
 
-  // Função separada para exibir o AcademiaDialog
   void showAcademiaDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AcademiaDialog(); // Exibe o componente AcademiaDialog
+        return AcademiaDialog();
       },
     );
   }
-}
-
-void _showAcademiaDetails(BuildContext context, Map<String, dynamic> academia) {
-  showModalBottomSheet(
-    context: context,
-    builder: (BuildContext context) {
-      return AcademiaDetailsBottomSheet(
-        nome: academia['nome'],
-        endereco: academia['endereco'],
-        lotacao: academia['lotacao'], // Passa a lotação para o componente
-      );
-    },
-  );
 }

@@ -17,7 +17,6 @@ class _LoginState extends State<Login> {
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
 
-  // Exibe o indicador de carregamento
   void _showLoadingDialog() {
     showDialog(
       context: context,
@@ -32,9 +31,26 @@ class _LoginState extends State<Login> {
     );
   }
 
-  // Fecha o diálogo de carregamento
   void _hideLoadingDialog() {
     Navigator.pop(context);
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Erro de Login'),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Future<void> _loginUser() async {
@@ -43,7 +59,7 @@ class _LoginState extends State<Login> {
         _isLoading = true;
       });
 
-      _showLoadingDialog(); // Exibe o indicador de carregamento
+      _showLoadingDialog();
 
       try {
         await apiService.loginUser(
@@ -53,16 +69,16 @@ class _LoginState extends State<Login> {
 
         _hideLoadingDialog();
 
-        // Redireciona para a página principal em caso de sucesso
+        // Navega para a página principal
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const Principal()),
         );
       } catch (e) {
         _hideLoadingDialog();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao fazer login: $e')),
-        );
+
+        // Exibe o pop-up com o erro
+        _showErrorDialog('Email ou senha incorretos. Por favor, tente novamente.');
       } finally {
         setState(() {
           _isLoading = false;
@@ -85,7 +101,7 @@ class _LoginState extends State<Login> {
         centerTitle: true,
         backgroundColor: const Color(0xFFFF6000),
         iconTheme: const IconThemeData(
-          color: Colors.white, // Define a cor do ícone para branco
+          color: Colors.white,
         ),
       ),
       body: SingleChildScrollView(
@@ -97,15 +113,20 @@ class _LoginState extends State<Login> {
             children: [
               Image.asset(
                 'assets/GymCrowdLogo2.png',
-                height: 300,
+                height: 200,
               ),
               const SizedBox(height: 32),
               TextFormField(
                 controller: _emailController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Email',
-                  labelStyle: TextStyle(color: Color(0xFFFF6000)),
-                  border: OutlineInputBorder(),
+                  labelStyle: const TextStyle(color: Colors.black),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  focusedBorder: const OutlineInputBorder(
+                    borderSide: BorderSide(color: Color(0xFFFF6000)),
+                  ),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -121,10 +142,15 @@ class _LoginState extends State<Login> {
               TextFormField(
                 controller: _passwordController,
                 obscureText: true,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Senha',
-                  labelStyle: TextStyle(color: Color(0xFFFF6000)),
-                  border: OutlineInputBorder(),
+                  labelStyle: const TextStyle(color: Colors.black),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  focusedBorder: const OutlineInputBorder(
+                    borderSide: BorderSide(color: Color(0xFFFF6000)),
+                  ),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -134,24 +160,19 @@ class _LoginState extends State<Login> {
                 },
               ),
               const SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFFF6000),
-                      minimumSize: const Size(300, 50),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                   onPressed: _isLoading ? null : _loginUser,
-                    child: const Text(
-                      'Entrar',
-                      style: TextStyle(color: Colors.white),
-                    ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFFF6000),
+                  minimumSize: const Size(double.infinity, 50),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                ],
+                ),
+                onPressed: _isLoading ? null : _loginUser,
+                child: const Text(
+                  'Entrar',
+                  style: TextStyle(color: Colors.white, fontSize: 18),
+                ),
               ),
             ],
           ),
