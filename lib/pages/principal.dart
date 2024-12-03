@@ -20,7 +20,7 @@ class _PrincipalState extends State<Principal> {
   List<Map<String, dynamic>> academiasLocations = [];
   final ApiService apiService = ApiService();
   MapController mapController = MapController();
-
+  bool _isLoading = false; // Variável para gerenciar o estado de carregamento
 
   @override
   void initState() {
@@ -30,6 +30,10 @@ class _PrincipalState extends State<Principal> {
   }
 
   Future<void> _fetchAcademiaLocations() async {
+    setState(() {
+      _isLoading = true; // Inicia o carregamento
+    });
+
     try {
       List<AcademiaModelo> academias = await apiService.fetchAcademias();
       setState(() {
@@ -37,13 +41,17 @@ class _PrincipalState extends State<Principal> {
           return {
             'location': LatLng(academia.latitude, academia.longitude),
             'nome': academia.nome_fantasia,
-            'lotacao': academia.lotacao, // Nome da academia
-            'endereco': academia.endereco, // Endereço da academia
+            'lotacao': academia.lotacao,
+            'endereco': academia.endereco,
           };
         }).toList();
       });
     } catch (e) {
       print('Erro ao buscar localizações de academias: $e');
+    } finally {
+      setState(() {
+        _isLoading = false; // Finaliza o carregamento
+      });
     }
   }
 
@@ -112,37 +120,65 @@ class _PrincipalState extends State<Principal> {
     );
   }
 
+  void _showAcademiaDetails(BuildContext context, Map<String, dynamic> academia) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return AcademiaDetailsBottomSheet(
+          nome: academia['nome'],
+          endereco: academia['endereco'],
+          lotacao: academia['lotacao'],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: 100, // Define a altura da AppBar para acomodar a imagem
+        toolbarHeight: 100,
         backgroundColor: const Color(0xFFFF6000),
         title: Image.asset(
-          'assets/GymCrowdLogoWhite.png', // Caminho para a imagem no diretório assets
-          height: 80, // Define a altura da imagem
+          'assets/GymCrowdLogoWhite.png',
+          height: 80,
         ),
-        centerTitle: true, // Centraliza a imagem na AppBar
+        centerTitle: true,
         leading: Builder(
           builder: (context) => IconButton(
-            icon: const Icon(Icons.menu,
-                color: Colors.white), // Ícone "hamburguer" branco
+            icon: const Icon(Icons.menu, color: Colors.white),
             onPressed: () {
               Scaffold.of(context).openDrawer();
             },
           ),
         ),
+        actions: [
+          _isLoading
+              ? const Padding(
+                  padding: EdgeInsets.only(right: 16),
+                  child: Center(
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                    ),
+                  ),
+                )
+              : IconButton(
+                  icon: const Icon(Icons.refresh, color: Colors.white),
+                  onPressed: () async {
+                    await _fetchAcademiaLocations(); // Atualiza a lista de academias
+                  },
+                ),
+        ],
       ),
       drawer: buildCustomDrawer(context),
       body: _currentLocation == null
           ? const Center(
               child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(
-                    Color(0xFFFF6000)), // Cor laranja
+                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFF6000)),
               ),
-            ) // Mostra indicador de carregamento com cor laranja
+            )
           : FlutterMap(
-            mapController: mapController,
+              mapController: mapController,
               options: MapOptions(
                 initialCenter: _currentLocation!,
                 initialZoom: 13.0,
@@ -151,36 +187,83 @@ class _PrincipalState extends State<Principal> {
                 TileLayer(
                   urlTemplate:
                       'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                  subdomains: ['a', 'b', 'c'], // Usando tiles do OpenStreetMap
+                  subdomains: ['a', 'b', 'c'],
                 ),
                 MarkerLayer(
                   markers: [
                     Marker(
                       point: _currentLocation!,
-                      width: 40,
-                      height: 40,
-                      child: const Icon(
-                        Icons.location_on, // Ícone de localização
-                        color: Colors.red,
-                        size: 40.0, // Tamanho do ícone
+                      width: 50,
+                      height: 50,
+                      child: GestureDetector(
+                        onTap: () {
+                          print("Marcador da localização atual clicado!");
+                        },
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Container(
+                              width: 50,
+                              height: 50,
+                              decoration: BoxDecoration(
+                                color: Colors.red.withOpacity(0.8),
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.3),
+                                    blurRadius: 6,
+                                    offset: const Offset(0, 3),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const Icon(
+                              Icons.person,
+                              color: Colors.white,
+                              size: 30,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                     for (var location in academiasLocations)
                       Marker(
                         point: location['location'],
-                        width: 40,
-                        height: 40,
+                        width: 50,
+                        height: 50,
                         child: GestureDetector(
                           onTap: () {
-                            _showAcademiaDetails(context,
-                                location); // Mostra o modal com os detalhes da academia
+                            _showAcademiaDetails(context, location);
                             mapController.move(location['location'], 14);
-                            
                           },
-                          child: const Icon(
-                            Icons.location_on,
-                            color: Colors.blue,
-                            size: 40.0,
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              Container(
+                                width: 50,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  color: Colors.blue.withOpacity(0.8),
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: Colors.white,
+                                    width: 2.0,
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.3),
+                                      blurRadius: 6,
+                                      offset: const Offset(0, 3),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const Icon(
+                                Icons.fitness_center,
+                                color: Colors.white,
+                                size: 30,
+                              ),
+                            ],
                           ),
                         ),
                       ),
@@ -188,38 +271,38 @@ class _PrincipalState extends State<Principal> {
                 ),
               ],
             ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          showAcademiaDialog(context); // Chama a função para exibir o dialog
-        },
-        backgroundColor: const Color(0xFFFF6000), // Cor de fundo laranja
-        child: const Icon(Icons.add, color: Colors.white),
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton(
+            heroTag: 'resetZoom',
+            onPressed: () {
+              mapController.move(_currentLocation!, 13.0);
+            },
+            backgroundColor: const Color(0xFFFF6000),
+            child: const Icon(Icons.zoom_out_map, color: Colors.white),
+          ),
+          const SizedBox(height: 16),
+          FloatingActionButton(
+            heroTag: 'addAcademia',
+            onPressed: () {
+              showAcademiaDialog(context);
+            },
+            backgroundColor: const Color(0xFFFF6000),
+            child: const Icon(Icons.add, color: Colors.white),
+          ),
+        ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 
-  // Função separada para exibir o AcademiaDialog
   void showAcademiaDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AcademiaDialog(); // Exibe o componente AcademiaDialog
+        return AcademiaDialog();
       },
     );
   }
 }
-
-void _showAcademiaDetails(BuildContext context, Map<String, dynamic> academia) {
-  showModalBottomSheet(
-    context: context,
-    builder: (BuildContext context) {
-      return AcademiaDetailsBottomSheet(
-        nome: academia['nome'],
-        endereco: academia['endereco'],
-        lotacao: academia['lotacao'], // Passa a lotação para o componente
-      );
-    },
-  );
-}
-
